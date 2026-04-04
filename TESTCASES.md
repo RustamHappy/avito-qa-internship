@@ -599,4 +599,79 @@
 | Шаг | Действие | Ожидаемый результат |
 |-----|----------|---------------------|
 | 1 | Установить заголовок `Accept: application/json` | Заголовок установлен |
-| 2 |
+| 2 | Отправить GET запрос на `https://qa-internship.avito.com/api/1/555555/item` | Статус ответа `200 OK` |
+| 3 | Проверить тело ответа | Тело ответа соответствует JSON-схеме: `[ { "id": "<string>", "sellerId": "<integer>", "name": "<string>", "price": "<integer>", "statistics": { "likes": "<integer>", "viewCount": "<integer>", "contacts": "<integer>" }, "createdAt": "<string>" }, { "id": "<string>", "sellerId": "<integer>", "name": "<string>", "price": "<integer>", "statistics": { "likes": "<integer>", "viewCount": "<integer>", "contacts": "<integer>" }, "createdAt": "<string>" } ]` |
+| 4 | Проверить, что оба созданных объявления присутствуют в ответе | В ответе найдены оба идентификатора из предусловия |
+
+**Пример валидного тела запроса (для создания объявления):**
+
+    {
+      "sellerID": 555555,
+      "name": "Ноутбук",
+      "price": 150000,
+      "statistics": {
+        "likes": 10,
+        "viewCount": 10,
+        "contacts": 10
+      }
+    }
+
+---
+
+### TC-GET-SELLER-02: Получение объявлений продавца без объявлений
+
+| Шаг | Действие | Ожидаемый результат |
+|-----|----------|---------------------|
+| 1 | Установить заголовок `Accept: application/json` | Заголовок установлен |
+| 2 | Отправить GET запрос на `https://qa-internship.avito.com/api/1/999999/item` | Статус ответа `200 OK` |
+| 3 | Проверить тело ответа | Тело ответа — пустой массив `[]` |
+
+---
+
+### TC-GET-SELLER-03: Получение объявлений с невалидным sellerID (строковое значение)
+
+| Шаг | Действие | Ожидаемый результат |
+|-----|----------|---------------------|
+| 1 | Установить заголовок `Accept: application/json` | Заголовок установлен |
+| 2 | Отправить GET запрос на `https://qa-internship.avito.com/api/1/abc/item` | Статус ответа `400 Bad Request` |
+| 3 | Проверить тело ответа | Тело ответа соответствует JSON-схеме: `{ "result": { "messages": { "culpa_b92": "<string>", "enim_24f": "<string>", "mollit_aa": "<string>" }, "message": "<string>" }, "status": "<string>" }` |
+
+---
+
+### TC-GET-SELLER-04: Получение объявлений с sellerID = -1
+
+| Шаг | Действие | Ожидаемый результат |
+|-----|----------|---------------------|
+| 1 | Установить заголовок `Accept: application/json` | Заголовок установлен |
+| 2 | Отправить GET запрос на `https://qa-internship.avito.com/api/1/-1/item` | Статус ответа `400 Bad Request` |
+| 3 | Проверить тело ответа | Тело ответа соответствует JSON-схеме: `{ "result": { "messages": { "culpa_b92": "<string>", "enim_24f": "<string>", "mollit_aa": "<string>" }, "message": "<string>" }, "status": "<string>" }` |
+
+---
+
+### TC-GET-SELLER-05: Получение объявлений с sellerID = 0
+
+| Шаг | Действие | Ожидаемый результат |
+|-----|----------|---------------------|
+| 1 | Установить заголовок `Accept: application/json` | Заголовок установлен |
+| 2 | Отправить GET запрос на `https://qa-internship.avito.com/api/1/0/item` | Статус ответа `400 Bad Request` (или `200 OK` — уточнить у аналитика) |
+| 3 | Проверить тело ответа | Если `400` — тело ответа соответствует JSON-схеме: `{ "result": { "messages": { "culpa_b92": "<string>", "enim_24f": "<string>", "mollit_aa": "<string>" }, "message": "<string>" }, "status": "<string>" }`. Если `200` — пустой массив `[]` |
+
+---
+
+### TC-GET-SELLER-06: Получение объявлений с несуществующим sellerID
+
+| Шаг | Действие | Ожидаемый результат |
+|-----|----------|---------------------|
+| 1 | Установить заголовок `Accept: application/json` | Заголовок установлен |
+| 2 | Отправить GET запрос на `https://qa-internship.avito.com/api/1/999999999/item` | Статус ответа `200 OK` (пустой массив) или `404 Not Found` (уточнить у аналитика — баг в документации) |
+| 3 | Проверить тело ответа | Если `200 OK` — пустой массив `[]`. Если `404` — JSON-схема: `{ "result": "laborum", "status": "cillum enim eiusmod" }` |
+
+---
+
+### TC-GET-SELLER-07: Получение объявлений с пустым sellerID
+
+| Шаг | Действие | Ожидаемый результат |
+|-----|----------|---------------------|
+| 1 | Установить заголовок `Accept: application/json` | Заголовок установлен |
+| 2 | Отправить GET запрос на `https://qa-internship.avito.com/api/1//item` | Статус ответа `404 Not Found` |
+| 3 | Проверить тело ответа | Тело ответа соответствует JSON-схеме: `{ "result": "laborum", "status": "cillum enim eiusmod" }` |
