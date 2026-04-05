@@ -11,4 +11,6 @@
 pip install requests pytest
 ```
 ## 2. Запуск тестов
+```
 pytest avito_tests.py -v
+```
